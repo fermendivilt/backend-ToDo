@@ -8,6 +8,6 @@ public class HelloWorldController {
 
     @GetMapping("/")
     public String index(){
-        return "Hello world from Spring boot!";
+        return "Backend is active";
     }
 }
