@@ -6,8 +6,8 @@ public class ToDo {
     public int id;
     public String name;
     public LocalDate dueDate;
-    public boolean isDone;
-    public LocalDate doneDate;
+    public boolean isDone = false;
+    public LocalDate doneDate = null;
     public Priority priority;
     public LocalDate creationDate;
 
@@ -16,20 +16,15 @@ public class ToDo {
         id = -1;
         name = "";
         dueDate = null;
-        isDone = false;
-        doneDate = null;
         priority = Priority.Low;
         creationDate = LocalDate.now();
 
     }
 
-    public ToDo(int id, String name, LocalDate dueDate, boolean isDone, LocalDate doneDate) {
+    public ToDo(String name, LocalDate dueDate) {
 
-        this.id = id;
         this.name = name;
         this.dueDate = dueDate;
-        this.isDone = isDone;
-        this.doneDate = doneDate;
         creationDate = LocalDate.now();
 
     }
