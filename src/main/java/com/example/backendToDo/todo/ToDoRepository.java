@@ -1,9 +1,12 @@
 package com.example.backendToDo.todo;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public interface ToDoRepository {
-    public String GetAll();
-    public ToDo Post();
-    public ToDo PostDone();
-    public ToDo Put();
-    public ToDo PutUndone();
+    public List<ToDo> GetAll();
+    public ToDo Post(ToDo newToDo);
+    public ToDo PostDone(int id);
+    public ToDo Put(int id, String name, LocalDate dueDate, Priority priority);
+    public ToDo PutUndone(int id);
 }

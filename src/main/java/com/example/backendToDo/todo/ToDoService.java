@@ -1,5 +1,6 @@
 package com.example.backendToDo.todo;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,31 +30,35 @@ public class ToDoService implements ToDoRepository {
     }
 
     @Override
-    public String GetAll() {
+    public List<ToDo> GetAll() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'GetAll'");
     }
 
     @Override
-    public ToDo Post() {
+    public ToDo Post(ToDo newToDo) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'Post'");
+        newToDo.id = toDoList.size();
+
+        toDoList.addLast(newToDo);
+
+        return toDoList.getLast();
     }
 
     @Override
-    public ToDo PostDone() {
+    public ToDo PostDone(int id) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'PostDone'");
     }
 
     @Override
-    public ToDo Put() {
+    public ToDo Put(int id, String name, LocalDate dueDate, Priority priority) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'Put'");
     }
 
     @Override
-    public ToDo PutUndone() {
+    public ToDo PutUndone(int id) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'PutUndone'");
     }
