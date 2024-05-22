@@ -2,16 +2,14 @@ package com.example.backendToDo.todo;
 
 import java.time.LocalDate;
 
-import org.springframework.cglib.core.Local;
-
 public class ToDo {
-    private int id;
-    private String name;
-    private LocalDate dueDate;
-    private boolean isDone;
-    private LocalDate doneDate;
-    private Priority priority;
-    private LocalDate creationDate;
+    public int id;
+    public String name;
+    public LocalDate dueDate;
+    public boolean isDone;
+    public LocalDate doneDate;
+    public Priority priority;
+    public LocalDate creationDate;
 
     public ToDo() {
 
@@ -36,13 +34,28 @@ public class ToDo {
 
     }
 
-    public int getId() {
-        return id;
-    }
+    // public int getId() {
+    //     return id;
+    // }
+    // public void setId(int id) {
+    //     this.id = id;
+    // }
+    
+    // public String getName() {
+    //     return this.name;
+    // }
+    // public void setName(String name) {
+    //     this.name = name;
+    // }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    // public LocalDate getDueDate() {
+    //     return this.dueDate;
+    // }
+    // public void setDueDate(LocalDate dueDate) {
+    //     this.dueDate = dueDate;
+    // }
+
+
 
     public void setIsDone(boolean isDone) {
         if (this.isDone) {
@@ -61,5 +74,3 @@ public class ToDo {
     }
 
 }
-
-enum Priority { Low, Medium, High }
