@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ToDoService implements ToDoRepository {
     // We want a singleton for toDoList be the same across the app
     private static ToDoService instance;
