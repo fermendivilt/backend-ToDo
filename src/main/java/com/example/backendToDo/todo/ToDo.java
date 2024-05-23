@@ -1,56 +1,49 @@
 package com.example.backendToDo.todo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ToDo {
-    public int id;
-    public String name;
-    public LocalDate dueDate;
+    public int id = -1;
+    public String name = "";
+    public Priority priority = Priority.NONE;
     public boolean isDone = false;
-    public LocalDate doneDate = null;
-    public Priority priority;
-    public LocalDate creationDate;
+
+    // Respect ISO 8601 spec, use LocalDateTime
+    public String dueDate = null;
+    public String doneDate = null;
+    public String creationDate = LocalDateTime.now().toString();
 
     public ToDo() {
-
-        id = -1;
-        name = "";
-        dueDate = null;
-        priority = Priority.Low;
-        creationDate = LocalDate.now();
-
     }
 
-    public ToDo(String name, LocalDate dueDate) {
+    public ToDo(String name, Priority priority, LocalDateTime dueDate) {
 
         this.name = name;
-        this.dueDate = dueDate;
-        creationDate = LocalDate.now();
+        this.priority = priority;
+        this.dueDate = dueDate.toString();
 
     }
 
     // public int getId() {
-    //     return id;
+    // return id;
     // }
     // public void setId(int id) {
-    //     this.id = id;
+    // this.id = id;
     // }
-    
+
     // public String getName() {
-    //     return this.name;
+    // return this.name;
     // }
     // public void setName(String name) {
-    //     this.name = name;
+    // this.name = name;
     // }
 
-    // public LocalDate getDueDate() {
-    //     return this.dueDate;
+    // public LocalDateTime getDueDate() {
+    // return this.dueDate;
     // }
-    // public void setDueDate(LocalDate dueDate) {
-    //     this.dueDate = dueDate;
+    // public void setDueDate(LocalDateTime dueDate) {
+    // this.dueDate = dueDate;
     // }
-
-
 
     public void setIsDone(boolean isDone) {
         if (this.isDone) {
@@ -63,9 +56,16 @@ public class ToDo {
             // from undone to done
             if (isDone) {
                 this.isDone = true;
-                this.doneDate = LocalDate.now();
+                this.doneDate = LocalDateTime.now().toString();
             }
         }
     }
+
+    public static String FormatDateTime(LocalDateTime date) {
+
+        if(date == null) return LocalDateTime.now().toString();
+
+        return date.toString();
+    }   
 
 }
