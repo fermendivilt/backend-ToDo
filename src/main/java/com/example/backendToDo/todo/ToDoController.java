@@ -1,7 +1,9 @@
 package com.example.backendToDo.todo;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +19,11 @@ public class ToDoController {
     @Autowired
     public ToDoController(ToDoService toDoService){
         this.toDoService = toDoService;
+    }
+
+    @GetMapping("/todos")
+    public List<ToDo> getToDos(@RequestBody GetAllOptions options, ModelMap map){
+        return toDoService.GetAll(options);
     }
 
     @PostMapping("/todos")
