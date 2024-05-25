@@ -61,11 +61,13 @@ public class ToDo {
         }
     }
 
-    public static String FormatDateTime(LocalDateTime date) {
-
-        if(date == null) return LocalDateTime.now().toString();
-
-        return date.toString();
+    public static boolean FormateableDateTime(String date) {
+        try {
+            LocalDateTime.parse(date);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }   
 
 }

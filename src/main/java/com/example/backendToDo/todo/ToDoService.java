@@ -2,44 +2,27 @@ package com.example.backendToDo.todo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ToDoService implements ToDoRepository {
-    // We want a singleton for toDoList be the same across the app
-    private static ToDoService instance;
-    private List<ToDo> toDoList = new ArrayList<ToDo>();
+public class ToDoService {
+    
+    private final ToDoRepository repository;
 
-    // To prevent direct instantiation
-    private ToDoService() {
+    @Autowired
+    private ToDoService(InMemoryToDoRepository repository) {
+        this.repository = repository;
     }
 
-    // Singleton creation or safe obtention
-    public static ToDoService getInstance() {
-        if (instance == null) {
-
-            // esto asegura la seguridad de los hilos?
-            synchronized (ToDoService.class) {
-
-                if (instance == null) {
-
-                    instance = new ToDoService();
-                }
-            }
-        }
-
-        return instance;
-    }
-
-    @Override
     public List<ToDo> GetAll(GetAllOptions options) {
+        // TODO add possible validations from Post 
 
-        Stream<ToDo> result = toDoList.stream();
+        Stream<ToDo> result = this.repository.GetAll().stream();
 
         if (options.stateFilter != GetAllStateFilter.NONE)
             result = result.filter(toDo -> toDo.isDone == (options.stateFilter == GetAllStateFilter.DONE));
@@ -68,28 +51,25 @@ public class ToDoService implements ToDoRepository {
         return result.toList();
     }
 
-    @Override
     public ToDo Post(ToDo newToDo) {
-        newToDo.id = toDoList.size();
+        // TODO add validation: 
+        //  name existent and less than 120 chars
+        //  priority existent
+        //  duedate parseable to localdatetime
 
-        toDoList.addLast(newToDo);
-
-        return toDoList.getLast();
+        return this.repository.SaveNew(newToDo);
     }
 
-    @Override
     public ToDo PostDone(int id) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'PostDone'");
     }
 
-    @Override
     public ToDo Put(int id, String name, LocalDate dueDate, Priority priority) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'Put'");
     }
 
-    @Override
     public ToDo PutUndone(int id) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'PutUndone'");
