@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,11 +47,13 @@ public class ToDoControllerTest {
 
 	@Test
 	@Order(2)
-	public void postToDos() throws Exception {
-		ToDo postTest = new ToDo();
-		postTest.name = "Post test";
-		postTest.priority = Priority.MEDIUM;
-		String creationDateComparison = postTest.creationDate;
+	public void postToDo() throws Exception {
+		ToDo postTest = new ToDo(
+				"Post test",
+				Priority.MEDIUM,
+				LocalDateTime.now(),
+				null);
+
 		String postTestJSON = new ObjectMapper().writeValueAsString(postTest);
 
 		mvc.perform(MockMvcRequestBuilders.post("/todos")
@@ -61,7 +64,7 @@ public class ToDoControllerTest {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(0))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Post test"))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.priority").value("MEDIUM"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.creationDate").value(creationDateComparison));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.creationDate").value(postTest.creationDate));
 
 		localList.add(postTest);
 	}
@@ -72,9 +75,12 @@ public class ToDoControllerTest {
 		ToDo postTest = null;
 
 		for (int index = 1; index <= 15; index++) {
-			postTest = new ToDo();
-			postTest.name = "Post test " + (index + 1);
-			postTest.priority = Priority.LOW;
+			postTest = new ToDo(
+					"Post test " + (index + 1),
+					Priority.LOW,
+					LocalDateTime.now(),
+					null);
+
 			String postTestJSON1 = new ObjectMapper().writeValueAsString(postTest);
 
 			mvc.perform(MockMvcRequestBuilders.post("/todos")

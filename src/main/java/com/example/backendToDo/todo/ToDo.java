@@ -3,6 +3,7 @@ package com.example.backendToDo.todo;
 import java.time.LocalDateTime;
 
 public class ToDo {
+
     public int id = -1;
     public String name = "";
     public Priority priority = Priority.NONE;
@@ -11,16 +12,18 @@ public class ToDo {
     // Respect ISO 8601 spec, use LocalDateTime
     public String dueDate = null;
     public String doneDate = null;
-    public String creationDate = LocalDateTime.now().toString();
+    public String creationDate = null;
 
     public ToDo() {
     }
 
-    public ToDo(String name, Priority priority, LocalDateTime dueDate) {
+    public ToDo(String name, Priority priority, LocalDateTime creationDate, LocalDateTime dueDate) {
 
         this.name = name;
         this.priority = priority;
-        this.dueDate = dueDate.toString();
+        this.creationDate = creationDate.toString();
+        if (dueDate != null)
+            this.dueDate = dueDate.toString();
 
     }
 
@@ -68,6 +71,6 @@ public class ToDo {
         } catch (Exception e) {
             return false;
         }
-    }   
+    }
 
 }
