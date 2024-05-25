@@ -66,8 +66,9 @@ public class ToDoService {
         throw new UnsupportedOperationException("Unimplemented method 'PostDone'");
     }
 
-    public ToDo Put(int id, String name, LocalDate dueDate, Priority priority) {
+    public ToDo Put(ToDo toDo) {
         // TODO Auto-generated method stub
+        // TODO Validations id, name, dueDate, priority
         throw new UnsupportedOperationException("Unimplemented method 'Put'");
     }
 

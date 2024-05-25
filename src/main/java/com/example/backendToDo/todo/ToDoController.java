@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,5 +40,20 @@ public class ToDoController {
     @PostMapping("/todos")
     public ToDo postToDo(@RequestBody ToDo dto){
         return toDoService.Post(dto);
+    }
+
+    @PostMapping("/todos/{id}/done")
+    public ToDo postDone(@PathVariable("id") String id){
+        return toDoService.PostDone(Integer.parseInt(id));
+    }
+
+    @PutMapping("/todos/{id}")
+    public ToDo putToDo(@RequestBody ToDo dto){
+        return toDoService.Put(dto);
+    }
+
+    @PostMapping("/todos/{id}/undone")
+    public ToDo putUndone(@PathVariable("id") String id){
+        return toDoService.PostDone(Integer.parseInt(id));
     }
 }
