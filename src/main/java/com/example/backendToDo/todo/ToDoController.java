@@ -21,8 +21,18 @@ public class ToDoController {
     }
 
     @GetMapping("/todos")
-    public List<ToDo> getToDos(@RequestBody GetAllOptions options){
-        return toDoService.GetAll(options);
+    public GetAllResponseDTO getToDos(@RequestBody GetAllOptions options){
+
+        int elementsPerPage = 10;
+
+        List<ToDo> result = toDoService.GetAll(options);
+        int elements = result.size();
+
+        result = result.stream()
+            .skip((options.pageNumber - 1) * elementsPerPage).limit(elementsPerPage)
+            .toList();
+
+        return new GetAllResponseDTO(result, elements / elementsPerPage + 1);
     }
 
     @PostMapping("/todos")

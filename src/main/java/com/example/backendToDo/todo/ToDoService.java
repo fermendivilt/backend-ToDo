@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ToDoService {
-    
+
     private final ToDoRepository repository;
 
     @Autowired
@@ -20,7 +20,7 @@ public class ToDoService {
     }
 
     public List<ToDo> GetAll(GetAllOptions options) {
-
+        
         Stream<ToDo> result = this.repository.GetAll().stream();
 
         if (options.stateFilter != GetAllStateFilter.NONE)
@@ -44,8 +44,6 @@ public class ToDoService {
                 result = result.sorted(Comparator.comparing(toDo -> toDo.priority));
             else
                 result = result.sorted(Comparator.comparing((ToDo toDo) -> toDo.priority).reversed());
-
-        result = result.skip((options.pageNumber - 1) * 10).limit(10);
 
         return result.toList();
     }

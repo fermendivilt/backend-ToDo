@@ -25,6 +25,7 @@ import com.example.backendToDo.todo.ToDo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.backendToDo.todo.GetAllOptions;
+import com.example.backendToDo.todo.GetAllResponseDTO;
 import com.example.backendToDo.todo.Priority;
 
 @SpringBootTest
@@ -109,13 +110,16 @@ public class ToDoControllerTest {
 				.andExpect(status().isOk())
 				.andReturn();
 
-		List<ToDo> content = new ObjectMapper().readValue(
+		GetAllResponseDTO content = new ObjectMapper().readValue(
 				result.getResponse().getContentAsString(),
-				new TypeReference<List<ToDo>>() {
+				new TypeReference<GetAllResponseDTO>() {
 				});
 
-		if (content.isEmpty() || content.size() != 10)
+		if (content.toDos.isEmpty() || content.toDos.size() != 10)
 			throw new Exception("List size unexpected, should be 10");
+
+		if (content.pages != 2)
+			throw new Exception("2 pages expected");
 	}
 
 	@Test
@@ -133,22 +137,25 @@ public class ToDoControllerTest {
 				.andExpect(status().isOk())
 				.andReturn();
 
-		List<ToDo> content = new ObjectMapper().readValue(
+		GetAllResponseDTO content = new ObjectMapper().readValue(
 				result.getResponse().getContentAsString(),
-				new TypeReference<List<ToDo>>() {
+				new TypeReference<GetAllResponseDTO>() {
 				});
 
-		if (content.isEmpty() || content.size() != 1)
+		if (content.toDos.isEmpty() || content.toDos.size() != 1)
 			throw new Exception("List size unexpected, should be 1");
 
-		ToDo fetchedToDo = content.get(0);
+		if (content.pages != 1)
+			throw new Exception("1 page expected");
+
+		ToDo fetchedToDo = content.toDos.get(0);
 		ToDo localToDo = localList.get(0);
 		if (fetchedToDo.id != 0 || // id asigned from backend
 				!fetchedToDo.name.equals(localToDo.name) ||
 				!fetchedToDo.priority.equals(localToDo.priority) ||
 				!(fetchedToDo.isDone == localToDo.isDone) ||
 				!fetchedToDo.creationDate.equals(localToDo.creationDate) ||
-				fetchedToDo.dueDate != localToDo.dueDate || //Value can be null, so equals() can crash
+				fetchedToDo.dueDate != localToDo.dueDate || // Value can be null, so equals() can crash
 				fetchedToDo.doneDate != localToDo.doneDate)
 			throw new Exception("Object fetched is not the same as created");
 	}
