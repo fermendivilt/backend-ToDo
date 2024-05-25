@@ -20,7 +20,6 @@ public class ToDoService {
     }
 
     public List<ToDo> GetAll(GetAllOptions options) {
-        // TODO add possible validations from Post 
 
         Stream<ToDo> result = this.repository.GetAll().stream();
 
@@ -52,10 +51,14 @@ public class ToDoService {
     }
 
     public ToDo Post(ToDo newToDo) {
-        // TODO add validation: 
-        //  name existent and less than 120 chars
-        //  priority existent
-        //  duedate parseable to localdatetime
+        if (newToDo.name == null ||
+                newToDo.name.length() > 120 ||
+                newToDo.priority == null ||
+                newToDo.creationDate == null ||
+                !ToDo.FormateableDateTime(newToDo.creationDate) ||
+                (newToDo.dueDate != null &&
+                        !ToDo.FormateableDateTime(newToDo.dueDate)))
+            return null;
 
         return this.repository.SaveNew(newToDo);
     }
