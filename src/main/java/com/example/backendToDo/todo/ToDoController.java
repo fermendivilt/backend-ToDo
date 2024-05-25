@@ -22,7 +22,7 @@ public class ToDoController {
     }
 
     @GetMapping("/todos")
-    public List<ToDo> getToDos(@RequestBody GetAllOptions options, ModelMap map){
+    public List<ToDo> getToDos(@RequestBody GetAllOptions options){
         return toDoService.GetAll(options);
     }
 
