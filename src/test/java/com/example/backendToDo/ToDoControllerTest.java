@@ -159,4 +159,39 @@ public class ToDoControllerTest {
 				fetchedToDo.doneDate != localToDo.doneDate)
 			throw new Exception("Object fetched is not the same as created");
 	}
+
+	@Test
+	@Order(6)
+	public void setToDoAsDone() throws Exception {
+		int id = 11;
+
+		MvcResult result = mvc.perform(MockMvcRequestBuilders.post("/todos/" + id + "/done")
+				.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andReturn();
+		ToDo updatedToDo = new ObjectMapper().readValue(result.getResponse().getContentAsString(), ToDo.class);
+
+		GetAllOptions options = new GetAllOptions();
+		options.nameFilter = updatedToDo.name;
+		String optionsJSON = new ObjectMapper().writeValueAsString(options);
+
+		MvcResult checkInList = mvc.perform(MockMvcRequestBuilders.get("/todos")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(optionsJSON))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		GetAllResponseDTO content = new ObjectMapper().readValue(
+				checkInList.getResponse().getContentAsString(),
+				new TypeReference<GetAllResponseDTO>() {
+				});
+		ToDo toDoFromGet = content.toDos.get(0);
+
+		if(!toDoFromGet.isDone)
+			throw new Exception("ToDo 11 was not set to done");
+		
+		if(toDoFromGet.doneDate == null || !toDoFromGet.doneDate.equals(updatedToDo.doneDate))
+			throw new Exception("ToDo 11 doneDate was not updated. \n|"+toDoFromGet.doneDate+"| vs |"+updatedToDo.doneDate + "|");
+	}
 }

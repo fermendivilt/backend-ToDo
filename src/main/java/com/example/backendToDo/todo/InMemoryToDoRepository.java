@@ -24,4 +24,8 @@ public class InMemoryToDoRepository implements ToDoRepository {
         return todos.getLast();
     }
 
+    @Override
+    public ToDo SaveChanges(ToDo toDo){
+        return todos.get(toDo.id).UpdateData(toDo);
+    }
 }

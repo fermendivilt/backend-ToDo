@@ -62,8 +62,14 @@ public class ToDoService {
     }
 
     public ToDo PostDone(int id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'PostDone'");
+        List<ToDo> todos = this.repository.GetAll();
+
+        if(id < 0 || id >= todos.size()) return null;
+
+        ToDo result = todos.get(id);
+        result.SetIsDone(true);
+
+        return this.repository.SaveChanges(result);
     }
 
     public ToDo Put(ToDo toDo) {

@@ -48,7 +48,18 @@ public class ToDo {
     // this.dueDate = dueDate;
     // }
 
-    public void setIsDone(boolean isDone) {
+    public ToDo UpdateData(ToDo toDo){
+
+        this.name = toDo.name;
+        this.priority = toDo.priority;
+        this.isDone = toDo.isDone;
+        this.doneDate = toDo.doneDate;
+        this.dueDate = toDo.dueDate;
+
+        return this;
+    }
+
+    public void SetIsDone(boolean isDone) {
         if (this.isDone) {
             // from done to undone
             if (!isDone) {
