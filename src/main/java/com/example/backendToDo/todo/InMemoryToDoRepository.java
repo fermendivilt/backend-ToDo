@@ -25,7 +25,7 @@ public class InMemoryToDoRepository implements ToDoRepository {
     }
 
     @Override
-    public ToDo SaveChanges(ToDo toDo){
-        return todos.get(toDo.id).UpdateData(toDo);
+    public ToDo SaveChanges(int id, ToDo toDo){
+        return todos.get(id).UpdateData(toDo);
     }
 }

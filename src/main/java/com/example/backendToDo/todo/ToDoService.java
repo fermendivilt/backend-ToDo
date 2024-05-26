@@ -20,7 +20,7 @@ public class ToDoService {
     }
 
     public List<ToDo> GetAll(GetAllOptions options) {
-        
+
         Stream<ToDo> result = this.repository.GetAll().stream();
 
         if (options.stateFilter != GetAllStateFilter.NONE)
@@ -69,7 +69,7 @@ public class ToDoService {
         ToDo result = todos.get(id);
         result.SetIsDone(true);
 
-        return this.repository.SaveChanges(result);
+        return this.repository.SaveChanges(id, result);
     }
 
     public ToDo Put(ToDo toDo) {
