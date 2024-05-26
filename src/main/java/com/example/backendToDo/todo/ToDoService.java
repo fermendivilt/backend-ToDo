@@ -50,7 +50,7 @@ public class ToDoService {
 
     public ToDo Post(ToDo newToDo) {
         if (newToDo.name == null ||
-                newToDo.name.length() > 120 ||
+                newToDo.name.length() < 1 || newToDo.name.length() > 120 ||
                 newToDo.priority == null ||
                 newToDo.creationDate == null ||
                 !ToDo.FormateableDateTime(newToDo.creationDate) ||
