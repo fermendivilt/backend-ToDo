@@ -48,8 +48,8 @@ public class ToDoController {
     }
 
     @PutMapping("/todos/{id}")
-    public ToDo putToDo(@RequestBody ToDo dto){
-        return toDoService.Put(dto);
+    public ToDo putToDo(@PathVariable("id") String id, @RequestBody ToDo dto){
+        return toDoService.Put(Integer.parseInt(id), dto);
     }
 
     @PostMapping("/todos/{id}/undone")

@@ -188,10 +188,53 @@ public class ToDoControllerTest {
 				});
 		ToDo toDoFromGet = content.toDos.get(0);
 
-		if(!toDoFromGet.isDone)
+		if (!toDoFromGet.isDone)
 			throw new Exception("ToDo 11 was not set to done");
-		
-		if(toDoFromGet.doneDate == null || !toDoFromGet.doneDate.equals(updatedToDo.doneDate))
-			throw new Exception("ToDo 11 doneDate was not updated. \n|"+toDoFromGet.doneDate+"| vs |"+updatedToDo.doneDate + "|");
+
+		if (toDoFromGet.doneDate == null || !toDoFromGet.doneDate.equals(updatedToDo.doneDate))
+			throw new Exception("ToDo 11 doneDate was not updated. \n|" + toDoFromGet.doneDate + "| vs |"
+					+ updatedToDo.doneDate + "|");
+	}
+
+	@Test
+	@Order(7)
+	public void putToDo() throws Exception {
+		int id = 8;
+		ToDo modified = localList.get(id);
+		modified.name = "Put ToDo with validations";
+		modified.priority = Priority.HIGH;
+		modified.dueDate = LocalDateTime.of(2024, 5, 25, 0, 0, 0).toString();
+		String modifiedJSON = new ObjectMapper().writeValueAsString(modified);
+
+		mvc.perform(MockMvcRequestBuilders.put("/todos/" + id)
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(modifiedJSON))
+				.andExpect(status().isOk());
+
+		GetAllOptions options = new GetAllOptions();
+		options.nameFilter = modified.name;
+		String optionsJSON = new ObjectMapper().writeValueAsString(options);
+
+		MvcResult checkInList = mvc.perform(MockMvcRequestBuilders.get("/todos")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(optionsJSON))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		GetAllResponseDTO content = new ObjectMapper().readValue(
+				checkInList.getResponse().getContentAsString(),
+				new TypeReference<GetAllResponseDTO>() {
+				});
+		ToDo toDoFromGet = content.toDos.get(0);
+
+		if (!toDoFromGet.name.equals(modified.name))
+			throw new Exception("ToDo 8 name not modified");
+		if (!toDoFromGet.dueDate.equals(modified.dueDate))
+			throw new Exception("ToDo 8 dueDate not modified");
+		if (!toDoFromGet.priority.equals(modified.priority))
+			throw new Exception("ToDo 8 priority not modified");
+
 	}
 }

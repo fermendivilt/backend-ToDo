@@ -72,10 +72,17 @@ public class ToDoService {
         return this.repository.SaveChanges(id, result);
     }
 
-    public ToDo Put(ToDo toDo) {
-        // TODO Auto-generated method stub
-        // TODO Validations id, name, dueDate, priority
-        throw new UnsupportedOperationException("Unimplemented method 'Put'");
+    public ToDo Put(int id, ToDo toDo) {
+        List<ToDo> todos = this.repository.GetAll();
+
+        if (id < 0 || id >= todos.size() ||
+                toDo.name == null || toDo.name.length() > 120 ||
+                toDo.priority == null ||
+                (toDo.dueDate != null &&
+                    !ToDo.FormateableDateTime(toDo.dueDate)))
+            return null;
+
+        return this.repository.SaveChanges(id, toDo);
     }
 
     public ToDo PutUndone(int id) {
