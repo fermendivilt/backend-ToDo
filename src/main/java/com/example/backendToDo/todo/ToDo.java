@@ -52,9 +52,9 @@ public class ToDo {
 
         this.name = toDo.name;
         this.priority = toDo.priority;
-        this.isDone = toDo.isDone;
-        this.doneDate = toDo.doneDate;
         this.dueDate = toDo.dueDate;
+
+        this.SetIsDone(toDo.isDone);
 
         return this;
     }
