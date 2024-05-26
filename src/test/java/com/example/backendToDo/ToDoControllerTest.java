@@ -237,4 +237,36 @@ public class ToDoControllerTest {
 			throw new Exception("ToDo 8 priority not modified");
 
 	}
+
+	@Test
+	@Order(8)
+	public void setToDoAsUndone() throws Exception {
+		int id = 11;
+
+		MvcResult result = mvc.perform(MockMvcRequestBuilders.put("/todos/" + id + "/undone")
+				.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andReturn();
+		ToDo updatedToDo = new ObjectMapper().readValue(result.getResponse().getContentAsString(), ToDo.class);
+
+		GetAllOptions options = new GetAllOptions();
+		options.nameFilter = updatedToDo.name;
+		String optionsJSON = new ObjectMapper().writeValueAsString(options);
+
+		MvcResult checkInList = mvc.perform(MockMvcRequestBuilders.get("/todos")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(optionsJSON))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		GetAllResponseDTO content = new ObjectMapper().readValue(
+				checkInList.getResponse().getContentAsString(),
+				new TypeReference<GetAllResponseDTO>() {
+				});
+		ToDo toDoFromGet = content.toDos.get(0);
+
+		if (!toDoFromGet.isDone)
+			throw new Exception("ToDo 11 was not set to undone");
+	}
 }
