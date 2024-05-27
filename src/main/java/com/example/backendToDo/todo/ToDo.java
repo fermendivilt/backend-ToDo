@@ -3,6 +3,7 @@ package com.example.backendToDo.todo;
 import java.time.LocalDateTime;
 
 public class ToDo {
+
     public int id = -1;
     public String name = "";
     public Priority priority = Priority.NONE;
@@ -11,16 +12,18 @@ public class ToDo {
     // Respect ISO 8601 spec, use LocalDateTime
     public String dueDate = null;
     public String doneDate = null;
-    public String creationDate = LocalDateTime.now().toString();
+    public String creationDate = null;
 
     public ToDo() {
     }
 
-    public ToDo(String name, Priority priority, LocalDateTime dueDate) {
+    public ToDo(String name, Priority priority, LocalDateTime creationDate, LocalDateTime dueDate) {
 
         this.name = name;
         this.priority = priority;
-        this.dueDate = dueDate.toString();
+        this.creationDate = creationDate.toString();
+        if (dueDate != null)
+            this.dueDate = dueDate.toString();
 
     }
 
@@ -45,7 +48,18 @@ public class ToDo {
     // this.dueDate = dueDate;
     // }
 
-    public void setIsDone(boolean isDone) {
+    public ToDo UpdateData(ToDo toDo){
+
+        this.name = toDo.name;
+        this.priority = toDo.priority;
+        this.dueDate = toDo.dueDate;
+
+        this.SetIsDone(toDo.isDone);
+
+        return this;
+    }
+
+    public void SetIsDone(boolean isDone) {
         if (this.isDone) {
             // from done to undone
             if (!isDone) {
@@ -61,11 +75,13 @@ public class ToDo {
         }
     }
 
-    public static String FormatDateTime(LocalDateTime date) {
-
-        if(date == null) return LocalDateTime.now().toString();
-
-        return date.toString();
-    }   
+    public static boolean FormateableDateTime(String date) {
+        try {
+            LocalDateTime.parse(date);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 }

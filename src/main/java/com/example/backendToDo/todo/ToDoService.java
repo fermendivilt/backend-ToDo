@@ -1,45 +1,26 @@
 package com.example.backendToDo.todo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ToDoService implements ToDoRepository {
-    // We want a singleton for toDoList be the same across the app
-    private static ToDoService instance;
-    private List<ToDo> toDoList = new ArrayList<ToDo>();
+public class ToDoService {
 
-    // To prevent direct instantiation
-    private ToDoService() {
+    private final ToDoRepository repository;
+
+    @Autowired
+    private ToDoService(InMemoryToDoRepository repository) {
+        this.repository = repository;
     }
 
-    // Singleton creation or safe obtention
-    public static ToDoService getInstance() {
-        if (instance == null) {
-
-            // esto asegura la seguridad de los hilos?
-            synchronized (ToDoService.class) {
-
-                if (instance == null) {
-
-                    instance = new ToDoService();
-                }
-            }
-        }
-
-        return instance;
-    }
-
-    @Override
     public List<ToDo> GetAll(GetAllOptions options) {
 
-        Stream<ToDo> result = toDoList.stream();
+        Stream<ToDo> result = this.repository.GetAll().stream();
 
         if (options.stateFilter != GetAllStateFilter.NONE)
             result = result.filter(toDo -> toDo.isDone == (options.stateFilter == GetAllStateFilter.DONE));
@@ -63,35 +44,54 @@ public class ToDoService implements ToDoRepository {
             else
                 result = result.sorted(Comparator.comparing((ToDo toDo) -> toDo.priority).reversed());
 
-        result = result.skip((options.pageNumber - 1) * 10).limit(10);
-
         return result.toList();
     }
 
-    @Override
     public ToDo Post(ToDo newToDo) {
-        newToDo.id = toDoList.size();
+        if (newToDo.name == null ||
+                newToDo.name.length() < 1 || newToDo.name.length() > 120 ||
+                newToDo.priority == null ||
+                newToDo.creationDate == null ||
+                !ToDo.FormateableDateTime(newToDo.creationDate) ||
+                (newToDo.dueDate != null &&
+                        !ToDo.FormateableDateTime(newToDo.dueDate)))
+            return null;
 
-        toDoList.addLast(newToDo);
-
-        return toDoList.getLast();
+        return this.repository.SaveNew(newToDo);
     }
 
-    @Override
     public ToDo PostDone(int id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'PostDone'");
+        List<ToDo> todos = this.repository.GetAll();
+
+        if(id < 0 || id >= todos.size()) return null;
+
+        ToDo result = todos.get(id);
+        result.SetIsDone(true);
+
+        return this.repository.SaveChanges(id, result);
     }
 
-    @Override
-    public ToDo Put(int id, String name, LocalDate dueDate, Priority priority) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'Put'");
+    public ToDo Put(int id, ToDo toDo) {
+        List<ToDo> todos = this.repository.GetAll();
+
+        if (id < 0 || id >= todos.size() ||
+                toDo.name == null || toDo.name.length() > 120 ||
+                toDo.priority == null ||
+                (toDo.dueDate != null &&
+                    !ToDo.FormateableDateTime(toDo.dueDate)))
+            return null;
+
+        return this.repository.SaveChanges(id, toDo);
     }
 
-    @Override
     public ToDo PutUndone(int id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'PutUndone'");
+        List<ToDo> todos = this.repository.GetAll();
+
+        if(id < 0 || id >= todos.size()) return null;
+
+        ToDo result = todos.get(id);
+        result.SetIsDone(false);
+
+        return this.repository.SaveChanges(id, result);
     }
 }
