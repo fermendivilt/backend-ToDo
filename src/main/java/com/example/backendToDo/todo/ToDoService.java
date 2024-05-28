@@ -28,7 +28,7 @@ public class ToDoService {
         if (options.priorityFilter != Priority.NONE)
             result = result.filter(toDo -> toDo.priority == options.priorityFilter);
 
-        if (options.nameFilter != null)
+        if (options.nameFilter != null && options.nameFilter.length() > 0)
             result = result.filter(toDo -> toDo.name.contains(options.nameFilter));
 
         if (options.sortingDueDate != GetAllSortingDirection.NONE)
