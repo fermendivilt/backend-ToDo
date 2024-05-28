@@ -25,7 +25,7 @@ public class ToDoService {
         if (options.stateFilter != GetAllStateFilter.NONE)
             result = result.filter(toDo -> toDo.isDone == (options.stateFilter == GetAllStateFilter.DONE));
 
-        if (options.priorityFilter != null)
+        if (options.priorityFilter != Priority.NONE)
             result = result.filter(toDo -> toDo.priority == options.priorityFilter);
 
         if (options.nameFilter != null)
