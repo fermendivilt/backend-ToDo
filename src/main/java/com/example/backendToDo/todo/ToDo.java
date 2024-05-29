@@ -53,8 +53,8 @@ public class ToDo {
         this.name = toDo.name;
         this.priority = toDo.priority;
         this.dueDate = toDo.dueDate;
-
-        this.SetIsDone(toDo.isDone);
+        this.isDone = toDo.isDone;
+        this.doneDate = toDo.doneDate;
 
         return this;
     }
