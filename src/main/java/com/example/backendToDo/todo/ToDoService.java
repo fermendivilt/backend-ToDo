@@ -55,7 +55,7 @@ public class ToDoService {
                 !ToDo.FormateableDateTime(newToDo.creationDate) ||
                 (newToDo.dueDate != null &&
                         !ToDo.FormateableDateTime(newToDo.dueDate)))
-            return null;
+            return newToDo;
 
         return this.repository.SaveNew(newToDo);
     }
