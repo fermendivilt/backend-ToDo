@@ -71,6 +71,6 @@ public class ToDoController {
 
     @PutMapping("/todos/{id}/undone")
     public ToDo putUndone(@PathVariable("id") String id){
-        return toDoService.PostDone(Integer.parseInt(id));
+        return toDoService.PutUndone(Integer.parseInt(id));
     }
 }
