@@ -6,4 +6,5 @@ public interface ToDoRepository {
     public List<ToDo> GetAll();
     public ToDo SaveNew(ToDo newToDo);
     public ToDo SaveChanges(int id, ToDo toDo);
+    public void Delete(int id);
 }

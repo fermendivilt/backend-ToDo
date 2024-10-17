@@ -3,13 +3,7 @@ package com.example.backendToDo.todo;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.websocket.server.PathParam;
 
@@ -19,8 +13,6 @@ public class ToDoController {
 
     private final ToDoService toDoService;
 
-    //Autowired injects dependencies during object creation (this case)
-    //  Also works in setters or directly in fields
     @Autowired
     public ToDoController(ToDoService service){
         this.toDoService = service;
@@ -72,5 +64,10 @@ public class ToDoController {
     @PutMapping("/todos/{id}/undone")
     public ToDo putUndone(@PathVariable("id") String id){
         return toDoService.PutUndone(Integer.parseInt(id));
+    }
+
+    @DeleteMapping("/todos/{id}")
+    public void deleteToDo(@PathVariable("id") String id) {
+        toDoService.delete(Integer.parseInt(id));
     }
 }

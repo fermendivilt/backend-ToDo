@@ -28,7 +28,7 @@ public class ToDoService {
         if (options.priorityFilter != Priority.NONE)
             result = result.filter(toDo -> toDo.priority == options.priorityFilter);
 
-        if (options.nameFilter != null && options.nameFilter.length() > 0)
+        if (options.nameFilter != null && !options.nameFilter.isEmpty())
             result = result.filter(toDo -> toDo.name.contains(options.nameFilter));
 
         if (options.sortingDueDate != GetAllSortingDirection.NONE)
@@ -49,7 +49,7 @@ public class ToDoService {
 
     public ToDo Post(ToDo newToDo) {
         if (newToDo.name == null ||
-                newToDo.name.length() < 1 || newToDo.name.length() > 120 ||
+            newToDo.name.isEmpty() || newToDo.name.length() > 120 ||
                 newToDo.priority == null ||
                 newToDo.creationDate == null ||
                 !ToDo.FormateableDateTime(newToDo.creationDate) ||
@@ -93,5 +93,10 @@ public class ToDoService {
         result.SetIsDone(false);
 
         return this.repository.SaveChanges(id, result);
+    }
+
+    public void delete(int id) {
+        if(id < 0 || id >= this.repository.GetAll().size()) return;
+        repository.Delete(id);
     }
 }
