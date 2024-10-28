@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InMemoryToDoRepository implements ToDoRepository {
     
-    private List<ToDo> todos = new ArrayList<>();
+    private final List<ToDo> todos = new ArrayList<>();
 
     @Override
     public List<ToDo> GetAll() {
@@ -27,5 +27,10 @@ public class InMemoryToDoRepository implements ToDoRepository {
     @Override
     public ToDo SaveChanges(int id, ToDo toDo){
         return todos.get(id).UpdateData(toDo);
+    }
+
+    @Override
+    public void Delete(int id){
+        todos.remove(id);
     }
 }
