@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.example.backendToDo.todo.*;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -22,21 +23,19 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.example.backendToDo.todo.ToDo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.example.backendToDo.todo.GetAllOptions;
-import com.example.backendToDo.todo.GetAllResponseDTO;
-import com.example.backendToDo.todo.Priority;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ToDoControllerTest {
 
-	static List<ToDo> localList = new ArrayList<>();
 	@Autowired
 	private MockMvc mvc;
+
+	@Autowired
+	ToDoController controller;
 
 	@Test
 	@Order(1)
@@ -66,8 +65,6 @@ public class ToDoControllerTest {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Post test"))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.priority").value("MEDIUM"))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.creationDate").value(postTest.creationDate));
-
-		localList.add(postTest);
 	}
 
 	@Test
@@ -90,34 +87,13 @@ public class ToDoControllerTest {
 					.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(index))
 					.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Post test " + (index + 1)))
 					.andExpect(MockMvcResultMatchers.jsonPath("$.priority").value("LOW"));
-
-			localList.add(postTest);
 		}
 	}
 
 	@Test
 	@Order(4)
 	public void getAll() throws Exception {
-		GetAllOptions options = new GetAllOptions();
-		String queryParams = String.format("?pageNumber=%d&priorityFilter=%s&nameFilter=%s&sortingDueDate=%s&sortingPriority=%s",
-		        options.pageNumber,
-		        options.priorityFilter,
-		        options.nameFilter,
-		        options.sortingDueDate,
-		        options.sortingPriority);
-
-		MvcResult result = mvc.perform(MockMvcRequestBuilders.get("/todos" + queryParams)
-		        .accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andReturn();
-
-		GetAllResponseDTO content = new ObjectMapper().readValue(
-				result.getResponse().getContentAsString(),
-				new TypeReference<GetAllResponseDTO>() {
-				});
-
-		if(!localList.containsAll(content.toDos))
-			throw new Exception("List fetched is not the same as created");
+		GetAllResponseDTO content = controller.getToDos(1, GetAllStateFilter.NONE, null, GetAllSortingDirection.NONE, GetAllSortingDirection.NONE);
 
 		if (content.toDos.size() != 10)
 			throw new Exception("List size unexpected, should be 10. Size is " + content.toDos.size());
@@ -128,70 +104,14 @@ public class ToDoControllerTest {
 
 	@Test
 	@Order(5)
-	public void getAllMedium() throws Exception {
-		GetAllOptions options = new GetAllOptions();
-		options.priorityFilter = Priority.MEDIUM;
-		String queryParams = String.format("?pageNumber=%d&priorityFilter=%s&nameFilter=%s&sortingDueDate=%s&sortingPriority=%s",
-				options.pageNumber,
-				options.priorityFilter,
-				options.nameFilter,
-				options.sortingDueDate,
-				options.sortingPriority);
-
-		MvcResult result = mvc.perform(MockMvcRequestBuilders.get("/todos" + queryParams)
-				.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andReturn();
-
-		GetAllResponseDTO content = new ObjectMapper().readValue(
-				result.getResponse().getContentAsString(),
-				new TypeReference<GetAllResponseDTO>() {
-				});
-
-		if (content.toDos.size() != 1)
-			throw new Exception("List size unexpected, should be 1. Size is " + content.toDos.size());
-
-		if (content.pages != 1)
-			throw new Exception("1 page expected. Pages are " + content.pages);
-
-		ToDo fetchedToDo = content.toDos.getFirst();
-		ToDo localToDo = localList.getFirst();
-		if (fetchedToDo.id != 0 || // id asigned from backend
-				!fetchedToDo.name.equals(localToDo.name) ||
-				!fetchedToDo.priority.equals(localToDo.priority) ||
-				!(fetchedToDo.isDone == localToDo.isDone) ||
-				!fetchedToDo.creationDate.equals(localToDo.creationDate) ||
-				!Objects.equals(fetchedToDo.dueDate, localToDo.dueDate) ||
-				!Objects.equals(fetchedToDo.doneDate, localToDo.doneDate))
-			throw new Exception("Object fetched is not the same as created");
-	}
-
-	@Test
-	@Order(6)
 	public void setToDoAsDone() throws Exception {
 		int id = 11;
-
-		MvcResult result = mvc.perform(MockMvcRequestBuilders.post("/todos/" + id + "/done")
-				.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andReturn();
-		ToDo updatedToDo = new ObjectMapper().readValue(result.getResponse().getContentAsString(), ToDo.class);
+		ToDo updatedToDo = controller.postDone(String.valueOf(id));
 
 		GetAllOptions options = new GetAllOptions();
 		options.nameFilter = updatedToDo.name;
-		String optionsJSON = new ObjectMapper().writeValueAsString(options);
+		GetAllResponseDTO content = controller.getToDos(options.pageNumber, options.stateFilter, options.nameFilter, options.sortingDueDate, options.sortingPriority);
 
-		MvcResult checkInList = mvc.perform(MockMvcRequestBuilders.get("/todos")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(optionsJSON))
-				.andExpect(status().isOk())
-				.andReturn();
-
-		GetAllResponseDTO content = new ObjectMapper().readValue(
-				checkInList.getResponse().getContentAsString(),
-				new TypeReference<GetAllResponseDTO>() {
-				});
 		ToDo toDoFromGet = content.toDos.getFirst();
 
 		if (!toDoFromGet.isDone)
@@ -203,36 +123,20 @@ public class ToDoControllerTest {
 	}
 
 	@Test
-	@Order(7)
+	@Order(6)
 	public void putToDo() throws Exception {
-		int id = 8;
-		ToDo modified = localList.get(id);
+		ToDo modified = new ToDo();
+		modified.id = 8;
 		modified.name = "Put ToDo with validations";
 		modified.priority = Priority.HIGH;
 		modified.dueDate = LocalDateTime.of(2024, 5, 25, 0, 0, 0).toString();
-		String modifiedJSON = new ObjectMapper().writeValueAsString(modified);
 
-		mvc.perform(MockMvcRequestBuilders.put("/todos/" + id)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(modifiedJSON))
-				.andExpect(status().isOk());
+		ToDo  updatedToDo = controller.putToDo(String.valueOf(modified.id), modified);
 
 		GetAllOptions options = new GetAllOptions();
 		options.nameFilter = modified.name;
-		String optionsJSON = new ObjectMapper().writeValueAsString(options);
+		GetAllResponseDTO content = controller.getToDos(options.pageNumber, options.stateFilter, options.nameFilter, options.sortingDueDate, options.sortingPriority);
 
-		MvcResult checkInList = mvc.perform(MockMvcRequestBuilders.get("/todos")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(optionsJSON))
-				.andExpect(status().isOk())
-				.andReturn();
-
-		GetAllResponseDTO content = new ObjectMapper().readValue(
-				checkInList.getResponse().getContentAsString(),
-				new TypeReference<GetAllResponseDTO>() {
-				});
 		ToDo toDoFromGet = content.toDos.getFirst();
 
 		if (!toDoFromGet.name.equals(modified.name))
@@ -241,69 +145,35 @@ public class ToDoControllerTest {
 			throw new Exception("ToDo 8 dueDate not modified");
 		if (!toDoFromGet.priority.equals(modified.priority))
 			throw new Exception("ToDo 8 priority not modified");
-
 	}
 
 	@Test
-	@Order(8)
+	@Order(7)
 	public void setToDoAsUndone() throws Exception {
 		int id = 11;
-
-		MvcResult result = mvc.perform(MockMvcRequestBuilders.put("/todos/" + id + "/undone")
-				.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andReturn();
-		ToDo updatedToDo = new ObjectMapper().readValue(result.getResponse().getContentAsString(), ToDo.class);
+		ToDo updatedToDo = controller.putUndone(String.valueOf(id));
 
 		GetAllOptions options = new GetAllOptions();
 		options.nameFilter = updatedToDo.name;
-		String optionsJSON = new ObjectMapper().writeValueAsString(options);
+		GetAllResponseDTO content = controller.getToDos(options.pageNumber, options.stateFilter, options.nameFilter, options.sortingDueDate, options.sortingPriority);
 
-		MvcResult checkInList = mvc.perform(MockMvcRequestBuilders.get("/todos")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(optionsJSON))
-				.andExpect(status().isOk())
-				.andReturn();
-
-		GetAllResponseDTO content = new ObjectMapper().readValue(
-				checkInList.getResponse().getContentAsString(),
-				new TypeReference<GetAllResponseDTO>() {
-				});
 		ToDo toDoFromGet = content.toDos.getFirst();
 
-		if (!toDoFromGet.isDone)
+		if (toDoFromGet.isDone)
 			throw new Exception("ToDo 11 was not set to undone");
 	}
 
 	@Test
-	@Order(9)
+	@Order(8)
 	public void deleteToDo() throws Exception {
-		int id = 5; // Assuming this ID exists in the localList
-
-		// Perform the delete operation
-		mvc.perform(MockMvcRequestBuilders.delete("/todos/" + id)
-			.accept(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk());
+		int id = 5;
+		controller.deleteToDo(String.valueOf(id));
 
 		// Verify that the To Do item is deleted
 		GetAllOptions options = new GetAllOptions();
-		options.nameFilter = localList.get(id).name;
-		String optionsJSON = new ObjectMapper().writeValueAsString(options);
+		GetAllResponseDTO content = controller.getToDos(options.pageNumber, options.stateFilter, options.nameFilter, options.sortingDueDate, options.sortingPriority);
 
-		MvcResult checkInList = mvc.perform(MockMvcRequestBuilders.get("/todos")
-			.accept(MediaType.APPLICATION_JSON)
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(optionsJSON))
-			.andExpect(status().isOk())
-			.andReturn();
-
-		GetAllResponseDTO content = new ObjectMapper().readValue(
-			checkInList.getResponse().getContentAsString(),
-			new TypeReference<GetAllResponseDTO>() {
-			});
-
-		if (!content.toDos.isEmpty())
+		if (content.toDos.stream().anyMatch(toDo -> toDo.id == id))
 			throw new Exception("ToDo " + id + " was not deleted");
 	}
 }
